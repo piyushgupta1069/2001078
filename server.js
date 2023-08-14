@@ -6,12 +6,7 @@ const port = 8008;
 
 // Middleware to handle the /numbers endpoint
 app.get('/numbers', async (req, res) => {
-    const urls = Array.isArray(req.query.url) ? req.query.url : [req.query.url];
-  
-//   if (!urls || !Array.isArray(urls)) {
-//     return res.status(400).json({ error: 'Invalid URL(s)' });
-//   }
-  
+  const urls = Array.isArray(req.query.url) ? req.query.url : [req.query.url];
   const uniqueNumbers = await getUniqueNumbersFromUrls(urls);
   
   res.json({ numbers: uniqueNumbers });
@@ -21,10 +16,11 @@ app.get('/numbers', async (req, res) => {
 async function getUniqueNumbersFromUrls(urls) {
   const fetchPromises = urls.map(async (url) => {
     try {
-        console.log(url.trim().length);
       const response = await axios.get(url, { timeout: 500 });
-      
-      return response.data.numbers;
+      if(Array.isArray(response.data.numbers) && response.data.numbers.length > 0){
+          return response.data.numbers;
+      }
+      return [];
     } catch (error) {
       return [];
     }
